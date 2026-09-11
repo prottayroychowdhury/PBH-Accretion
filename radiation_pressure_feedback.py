@@ -64,20 +64,6 @@ def solve_Meff_curve(z, M_grid=None, v_rel=0):
         M_eff.append(sol["M_eff"]); M_eff_over_M.append(sol["M_eff_over_M"])
     return {"M": M_grid, "M_eff": np.array(M_eff), "M_eff_over_M": np.array(M_eff_over_M)}
 
-def add_branched_legends(masses, colors):
-    mass_legend = plt.legend(
-        [Line2D([0], [0], color=color, linewidth=2) for color in colors[:len(masses)]],
-        [mass_labels[M] for M in masses], loc="lower left"
-    )
-    plt.gca().add_artist(mass_legend)
-    plt.legend(
-        [
-            Line2D([0], [0], color="black", linestyle=":", linewidth=2),
-            Line2D([0], [0], color="black", linestyle="--", linewidth=2),
-        ],
-        ["collisional", "photoionization"], loc="upper right"
-    )
-
 def plot_branched_luminosity_vs_z(masses=fig_masses, v_rel=0):
     plt.figure(figsize=(7.5, 5.2))
     colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
@@ -86,15 +72,26 @@ def plot_branched_luminosity_vs_z(masses=fig_masses, v_rel=0):
         photo = solve_redshift_curve(M, v_rel=v_rel, luminosity_func=L_photoionization)
         plt.loglog(coll["z"], coll["L_over_Ledd"], ":", color=color, linewidth=2, label=mass_labels[M] + " collisional")
         plt.loglog(photo["z"], photo["L_over_Ledd"], "--", color=color, linewidth=2, label=mass_labels[M] + " photoionization")
-    setup(r"Luminosity with radiation pressure feedback: branched", r"$L/L_{\rm Edd}$", (1e2, 1e5), (1e-16, 2))
-    add_branched_legends(masses, colors)
+    setup("Luminosity with radiation pressure feedback: branched\n"
+          + rf"$v_{{\rm rel}} = {v_rel / 1e3:g}\,\mathrm{{km\,s^{{-1}}}}$",
+          r"$L/L_{\rm Edd}$", (1e2, 1e5), (1e-16, 2))
+    mass_legend = plt.legend(
+        [Line2D([0], [0], color=color, linewidth=2) for color in colors[:len(masses)]],
+        [mass_labels[M] for M in masses])
+    plt.gca().add_artist(mass_legend)
+    plt.legend(
+        [Line2D([0], [0], color="black", linestyle=":", linewidth=2),
+        Line2D([0], [0], color="black", linestyle="--", linewidth=2),],
+        ["collisional", "photoionization"], loc="upper right")
 
 def plot_single_branch_luminosity_vs_z(masses=fig_masses, v_rel=0):
     plt.figure(figsize=(7.5, 5.2))
     for M in masses:
         sol = solve_redshift_curve(M, v_rel=v_rel)
         plt.loglog(sol["z"], sol["L_over_Ledd"], linewidth=2, label=mass_labels[M])
-    setup(r"Luminosity with radiation pressure feedback: single-branch", r"$L/L_{\rm Edd}$", (1e2, 1e5), (1e-16, 2))
+    setup("Luminosity with radiation pressure feedback: single-branch\n"
+          + rf"$v_{{\rm rel}} = {v_rel / 1e3:g}\,\mathrm{{km\,s^{{-1}}}}$",
+          r"$L/L_{\rm Edd}$", (1e2, 1e5), (1e-16, 2))
 
 def plot_branched_Meff_ratio_vs_z(masses=fig_masses, v_rel=0):
     plt.figure(figsize=(7.5, 5.2))
@@ -107,7 +104,14 @@ def plot_branched_Meff_ratio_vs_z(masses=fig_masses, v_rel=0):
     plt.axhline(1, linestyle="-", color="black", linewidth=1.2)
     plt.xlabel(r"$z$"); plt.ylabel(r"$M_{\rm eff}/M$"); plt.title(r"Effective mass suppression: branched treatment")
     plt.xlim(1e2, 1e5); plt.ylim(0, 1.05); plt.tight_layout()
-    add_branched_legends(masses, colors)
+    mass_legend = plt.legend(
+        [Line2D([0], [0], color=color, linewidth=2) for color in colors[:len(masses)]],
+        [mass_labels[M] for M in masses])
+    plt.gca().add_artist(mass_legend)
+    plt.legend(
+        [Line2D([0], [0], color="black", linestyle=":", linewidth=2),
+        Line2D([0], [0], color="black", linestyle="--", linewidth=2),],
+        ["collisional", "photoionization"], loc="upper right")
 
 def plot_single_branch_Meff_ratio_vs_z(masses=fig_masses, v_rel=0):
     plt.figure(figsize=(7.5, 5.2))
